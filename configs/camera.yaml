@@ -1,0 +1,50 @@
+source: 0
+output_video: outputs/camera_result.mp4
+output_events_csv: outputs/camera_events.csv
+display: true
+skip_frames: 0
+max_frames:
+
+camera:
+  backend: dshow
+  width: 1280
+  height: 720
+  fps: 30.0
+  warmup_frames: 10
+  flip_horizontal: false
+  flip_vertical: false
+  retry_open_count: 3
+
+model:
+  path: models/yolov8n.onnx
+  input_size: 640
+  score_threshold: 0.25
+  confidence_threshold: 0.25
+  nms_threshold: 0.45
+  labels: []
+  allowed_classes:
+    - car
+    - bus
+    - truck
+    - motorcycle
+
+tracking:
+  max_distance: 90.0
+  max_missing_frames: 20
+  min_confirmed_hits: 2
+  trail_size: 24
+
+speed:
+  real_distance_meters: 6.0
+  min_speed_kmh: 1.0
+  max_speed_kmh: 220.0
+  line_a:
+    name: A
+    start: [200, 250]
+    end: [1080, 250]
+    color_bgr: [0, 255, 255]
+  line_b:
+    name: B
+    start: [200, 430]
+    end: [1080, 430]
+    color_bgr: [0, 165, 255]

@@ -16,6 +16,8 @@ Aplikasi Python modern untuk deteksi kendaraan dan estimasi kecepatan berbasis Y
 - Output video beranotasi
 - Output event kecepatan ke file CSV
 - Konfigurasi YAML terpisah untuk desktop dan Termux
+- Preset khusus camera device atau webcam
+- Command bantu `cameras`, `doctor`, dan `init-config`
 - GitHub Actions untuk menjalankan test otomatis
 
 ## Struktur Proyek
@@ -25,8 +27,12 @@ cardetec/
 ├── .github/workflows/ci.yml
 ├── configs/
 │   ├── default.yaml
+│   ├── camera.yaml
+│   ├── camera-low-power.yaml
 │   └── termux.yaml
 ├── models/
+│   └── README.md
+├── outputs/
 ├── samples/
 ├── src/cardetec/
 │   ├── __init__.py
@@ -76,6 +82,18 @@ Perintah ini mengikuti pola yang direkomendasikan pada contoh resmi Ultralytics 
 
 Setelah file `.onnx` jadi, pindahkan ke folder `models/`.
 
+## Quick Start
+
+Jika Anda ingin aplikasi cepat langsung jalan di laptop atau PC:
+
+1. install dependensi,
+2. letakkan model `models/yolov8n.onnx`,
+3. scan kamera dengan `cardetec cameras`,
+4. cek setup dengan `cardetec doctor --config configs/camera.yaml --check-camera`,
+5. jalankan `cardetec run --config configs/camera.yaml`.
+
+Urutan ini sengaja dibuat agar Anda bisa tahu lebih dulu apakah model, config, dan camera device sudah siap.
+
 ## Instalasi Desktop
 
 ### 1. Clone repo
@@ -108,6 +126,11 @@ source .venv/bin/activate
 ```bash
 pip install --upgrade pip
 pip install -r requirements-desktop.txt
+```
+
+Opsional untuk mode development:
+
+```bash
 pip install -e .[dev]
 ```
 
@@ -121,6 +144,120 @@ pip install -e .[dev]
 ```bash
 cardetec run --config configs/default.yaml
 ```
+
+### 6. Cek environment
+
+```bash
+cardetec doctor --config configs/default.yaml
+```
+
+## Menggunakan Camera Device
+
+Versi terbaru aplikasi sudah ditingkatkan agar lebih cocok untuk webcam laptop atau kamera USB:
+
+- `source` dapat berupa angka seperti `0`, `1`, atau `2`
+- ada konfigurasi backend kamera seperti `dshow`, `msmf`, `v4l2`, atau `auto`
+- bisa mengatur resolusi target, FPS target, warmup frame, dan flip gambar
+- timestamp live camera memakai waktu nyata, bukan metadata file video
+
+### Jalankan webcam default
+
+```bash
+cardetec run --config configs/camera.yaml
+```
+
+### Scan camera device lebih dulu
+
+```bash
+cardetec cameras --max-devices 5 --backend dshow
+```
+
+Jika Anda memakai Linux:
+
+```bash
+cardetec cameras --max-devices 5 --backend v4l2
+```
+
+### Jika kamera utama bukan device `0`
+
+Ubah bagian ini:
+
+```yaml
+source: 1
+```
+
+### Preset untuk laptop biasa atau PC spek menengah
+
+```bash
+cardetec run --config configs/camera-low-power.yaml
+```
+
+Preset ini menurunkan resolusi, FPS, dan melewati sebagian frame agar inferensi lebih ringan.
+
+### Opsi camera yang tersedia
+
+```yaml
+camera:
+  backend: dshow
+  width: 1280
+  height: 720
+  fps: 30.0
+  warmup_frames: 10
+  flip_horizontal: false
+  flip_vertical: false
+  retry_open_count: 3
+```
+
+Keterangan:
+
+- `backend`: backend OpenCV untuk membuka kamera
+- `width` dan `height`: resolusi target capture
+- `fps`: target FPS kamera
+- `warmup_frames`: jumlah frame awal yang dibuang agar exposure lebih stabil
+- `flip_horizontal`: berguna jika webcam menampilkan preview seperti cermin
+- `retry_open_count`: jumlah percobaan buka kamera jika device lambat siap
+
+### Rekomendasi desktop Windows
+
+- pakai `backend: dshow` lebih dulu
+- jika gagal, coba `backend: msmf`
+- gunakan resolusi `1280x720` atau `960x540` bila inferensi terasa berat
+- letakkan dua garis kalibrasi di area jalan yang sering dilewati kendaraan
+
+### Cek kesiapan camera config
+
+```bash
+cardetec doctor --config configs/camera.yaml --check-camera
+```
+
+Perintah ini mengecek:
+
+- file config ada,
+- YAML bisa dibaca,
+- OpenCV tersedia,
+- file model tersedia,
+- kamera bisa dibuka jika `source` berupa device index.
+
+### Generate config lokal otomatis
+
+Jika Anda ingin membuat config baru tanpa mengedit file manual:
+
+```bash
+cardetec init-config --preset camera --output configs/local-camera.yaml --source 1
+```
+
+Untuk preset video:
+
+```bash
+cardetec init-config --preset video --output configs/local-video.yaml --source samples/traffic.mp4
+```
+
+### Rekomendasi laptop atau webcam
+
+- gunakan tripod atau posisi kamera statis
+- arahkan kamera ke jalan dari sudut yang konsisten
+- hindari auto-focus berlebihan dan guncangan
+- sesuaikan `skip_frames` jika CPU tidak kuat
 
 ## Instalasi di Termux
 
@@ -150,6 +287,7 @@ cd cardetec
 
 ```bash
 pip install --upgrade pip
+pip install -r requirements-termux.txt
 pip install -e . --no-deps
 ```
 
@@ -170,6 +308,12 @@ termux-setup-storage
 
 ```bash
 cardetec run --config configs/termux.yaml
+```
+
+### 7. Validasi setup Termux
+
+```bash
+cardetec doctor --config configs/termux.yaml
 ```
 
 Catatan:
@@ -207,9 +351,51 @@ Parameter penting:
 - `output_events_csv`: lokasi CSV event kecepatan
 - `display`: tampilkan window OpenCV atau tidak
 - `skip_frames`: lewati frame untuk mengurangi beban proses
+- `camera.backend`: backend kamera OpenCV
+- `camera.width`, `camera.height`, `camera.fps`: target capture untuk webcam
+- `camera.warmup_frames`: buang beberapa frame awal agar kamera stabil
+- `camera.flip_horizontal`, `camera.flip_vertical`: membalik frame live camera
 - `model.path`: path model YOLO ONNX
 - `speed.real_distance_meters`: jarak nyata antara garis `A` dan `B`
 - `speed.line_a` dan `speed.line_b`: koordinat piksel dua garis pengukuran
+
+## Command CLI
+
+Command utama yang sekarang tersedia:
+
+```bash
+cardetec run --config configs/camera.yaml
+cardetec cameras --max-devices 5 --backend dshow
+cardetec doctor --config configs/camera.yaml --check-camera
+cardetec init-config --preset camera --output configs/local-camera.yaml
+```
+
+Keterangan singkat:
+
+- `run`: menjalankan deteksi kendaraan dan estimasi kecepatan
+- `cameras`: scan device camera yang tersedia
+- `doctor`: validasi environment, config, model, dan camera
+- `init-config`: generate file config baru dari preset
+
+## Supaya Langsung Bisa Dipakai
+
+Checklist minimum:
+
+- Python sudah terpasang
+- OpenCV sudah terpasang
+- `PyYAML` dan `typer` sudah terpasang
+- model `models/yolov8n.onnx` sudah tersedia
+- kamera atau video source tersedia
+- garis `line_a` dan `line_b` sudah disesuaikan dengan sudut kamera Anda
+
+Langkah paling praktis untuk webcam:
+
+```bash
+pip install -r requirements-desktop.txt
+cardetec cameras --max-devices 5 --backend dshow
+cardetec doctor --config configs/camera.yaml --check-camera
+cardetec run --config configs/camera.yaml
+```
 
 ## Contoh Output CSV
 
