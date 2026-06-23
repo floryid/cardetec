@@ -1,109 +1,106 @@
+<div align="center">
+
 # CarDetec
 
-Aplikasi Python modern untuk deteksi kendaraan dan estimasi kecepatan berbasis YOLO ONNX + OpenCV DNN. Proyek ini dibuat agar:
+<p>
+  <strong>Deteksi kendaraan dan estimasi kecepatan berbasis YOLO ONNX + OpenCV DNN</strong>
+</p>
 
-- rapi untuk di-push ke GitHub,
-- ringan dibanding runtime berbasis PyTorch,
-- tetap realistis dijalankan di desktop dan Termux,
-- mudah dikalibrasi memakai dua garis pengukuran.
+<p>
+  <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/OpenCV-DNN-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white" alt="OpenCV">
+  <img src="https://img.shields.io/badge/YOLO-ONNX-111827?style=for-the-badge&logo=onnx&logoColor=white" alt="YOLO ONNX">
+  <img src="https://img.shields.io/badge/CLI-Typer-22C55E?style=for-the-badge" alt="Typer">
+</p>
 
-## Fitur
+<p>
+  <img src="https://img.shields.io/badge/Desktop-Windows%20%7C%20Linux%20%7C%20macOS-0EA5E9?style=flat-square" alt="Desktop">
+  <img src="https://img.shields.io/badge/Android-Termux-F97316?style=flat-square" alt="Termux">
+  <img src="https://img.shields.io/badge/License-MIT-10B981?style=flat-square" alt="MIT">
+</p>
 
-- Deteksi kendaraan dari video memakai model YOLO format `.onnx`
-- Filter kelas kendaraan: `car`, `bus`, `truck`, `motorcycle`
-- Tracking sederhana berbasis centroid
-- Estimasi kecepatan saat kendaraan melintasi dua garis kalibrasi
-- Output video beranotasi
-- Output event kecepatan ke file CSV
-- Konfigurasi YAML terpisah untuk desktop dan Termux
-- Preset khusus camera device atau webcam
-- Command bantu `cameras`, `doctor`, dan `init-config`
-- GitHub Actions untuk menjalankan test otomatis
+</div>
 
-## Struktur Proyek
+---
 
-```text
-cardetec/
-├── .github/workflows/ci.yml
-├── configs/
-│   ├── default.yaml
-│   ├── camera.yaml
-│   ├── camera-low-power.yaml
-│   └── termux.yaml
-├── models/
-│   └── README.md
-├── outputs/
-├── samples/
-├── src/cardetec/
-│   ├── __init__.py
-│   ├── cli.py
-│   ├── config.py
-│   ├── speed.py
-│   ├── tracker.py
-│   └── yolo_onnx.py
-├── tests/test_speed.py
-├── .gitignore
-├── pyproject.toml
-├── README.md
-└── requirements-desktop.txt
+## Overview
+CarDetec adalah aplikasi Python untuk mendeteksi kendaraan yang bergerak, melakukan tracking antar frame, lalu menghitung estimasi kecepatan saat kendaraan melintasi dua garis kalibrasi.
+
+Proyek ini dirancang agar:
+
+- ringan untuk CPU dengan `OpenCV DNN + ONNX`
+- rapi untuk dipakai sebagai repo GitHub
+- realistis dijalankan di desktop maupun Termux
+- mudah dipakai dengan preset webcam dan utilitas CLI
+
+## Highlights
+| Fitur | Keterangan |
+|---|---|
+| Deteksi Kendaraan | Filter kelas `car`, `bus`, `truck`, `motorcycle` |
+| Speed Estimation | Hitung kecepatan berdasarkan dua garis ukur |
+| Camera Ready | Mendukung webcam, USB camera, dan file video |
+| CLI Tools | Ada `run`, `cameras`, `doctor`, dan `init-config` |
+| Multi Config | Preset desktop, low-power, dan Termux |
+| GitHub Friendly | Struktur project bersih dan siap dipublish |
+
+## Quick Start
+Jika Anda ingin langsung mencoba dari webcam:
+
+```bash
+git clone https://github.com/floryid/cardetec.git
+cd cardetec
+pip install -r requirements-desktop.txt
+cardetec cameras --max-devices 5 --backend dshow
+cardetec doctor --config configs/camera.yaml --check-camera
+cardetec run --config configs/camera.yaml
 ```
 
-## Cara Kerja
+Untuk laptop atau PC spek menengah:
 
-1. Video dibaca frame per frame.
-2. Model YOLO ONNX mendeteksi kendaraan.
-3. Tracker menghubungkan kendaraan antar frame.
-4. Saat pusat objek melintasi garis `A` lalu `B`, sistem menghitung selisih waktu.
-5. Kecepatan dihitung dengan rumus:
+```bash
+cardetec run --config configs/camera-low-power.yaml
+```
+
+## Demo Flow
+Alur kerja aplikasi:
+
+```text
+Camera / Video
+      |
+      v
+YOLO ONNX Detection
+      |
+      v
+Centroid Tracking
+      |
+      v
+Cross Line A -> B
+      |
+      v
+Speed Estimation (km/h)
+      |
+      v
+Annotated Video + CSV Events
+```
+
+Rumus kecepatan:
 
 ```text
 kecepatan (km/h) = (jarak_meter / waktu_detik) * 3.6
 ```
 
-Supaya hasil akurat, jarak riil antara garis `A` dan `B` harus Anda ukur di lokasi sebenarnya.
+## Preview Style
+Tampilan overlay aplikasi sekarang dibuat lebih modern dan mendekati gaya speed detection CCTV:
 
-## Persiapan Model YOLO
+- judul hijau `YOLOV8 SPEED DETECTION`
+- box kendaraan hijau
+- label ID dan kecepatan di atas kendaraan
+- garis atas hijau
+- garis bawah merah
+- output event kecepatan ke CSV
 
-Repo ini tidak menyertakan file model karena ukurannya besar. Simpan model di:
-
-```text
-models/yolov8n.onnx
-```
-
-Jika Anda punya model `yolov8n.pt`, ekspor ke ONNX dengan Ultralytics:
-
-```bash
-pip install ultralytics
-yolo export model=yolov8n.pt imgsz=640 format=onnx opset=12
-```
-
-Perintah ini mengikuti pola yang direkomendasikan pada contoh resmi Ultralytics untuk YOLO ONNX + OpenCV:
-[Ultralytics YOLOv8 OpenCV ONNX Example](https://github.com/ultralytics/ultralytics/blob/main/examples/YOLOv8-OpenCV-ONNX-Python/README.md)
-
-Setelah file `.onnx` jadi, pindahkan ke folder `models/`.
-
-## Quick Start
-
-Jika Anda ingin aplikasi cepat langsung jalan di laptop atau PC:
-
-1. install dependensi,
-2. letakkan model `models/yolov8n.onnx`,
-3. scan kamera dengan `cardetec cameras`,
-4. cek setup dengan `cardetec doctor --config configs/camera.yaml --check-camera`,
-5. jalankan `cardetec run --config configs/camera.yaml`.
-
-Urutan ini sengaja dibuat agar Anda bisa tahu lebih dulu apakah model, config, dan camera device sudah siap.
-
-## Instalasi Desktop
-
-### 1. Clone repo
-
-```bash
-git clone https://github.com/username/cardetec.git
-cd cardetec
-```
-
-### 2. Buat virtual environment
+## Installation
+### Desktop
 
 ```bash
 python -m venv .venv
@@ -121,44 +118,77 @@ Linux/macOS:
 source .venv/bin/activate
 ```
 
-### 3. Install dependensi
+Install dependency:
 
 ```bash
 pip install --upgrade pip
 pip install -r requirements-desktop.txt
 ```
 
-Opsional untuk mode development:
+Opsional untuk development:
 
 ```bash
 pip install -e .[dev]
 ```
 
-### 4. Siapkan video dan model
-
-- Letakkan video contoh di `samples/traffic.mp4`
-- Letakkan model di `models/yolov8n.onnx`
-
-### 5. Jalankan aplikasi
+### Termux
+Pendekatan Termux sengaja memakai `OpenCV DNN + ONNX` agar tidak bergantung pada PyTorch desktop.
 
 ```bash
-cardetec run --config configs/default.yaml
+pkg update && pkg upgrade
+pkg install python git ffmpeg opencv-python python-numpy
+pip install --upgrade pip
+pip install -r requirements-termux.txt
+pip install -e . --no-deps
+termux-setup-storage
 ```
 
-### 6. Cek environment
+Referensi instalasi OpenCV di Termux:
+
+- [Termux Python Wiki](https://wiki.termux.com/wiki/Python)
+- [termux-packages issue #25847](https://github.com/termux/termux-packages/issues/25847)
+
+## Model Setup
+Model tidak disertakan ke repo agar ukuran repository tetap ringan.
+
+Simpan model di:
+
+```text
+models/yolov8n.onnx
+```
+
+Jika Anda punya `yolov8n.pt`, ekspor ke ONNX:
 
 ```bash
-cardetec doctor --config configs/default.yaml
+pip install ultralytics
+yolo export model=yolov8n.pt imgsz=640 format=onnx opset=12
 ```
 
-## Menggunakan Camera Device
+Panduan referensi:
 
-Versi terbaru aplikasi sudah ditingkatkan agar lebih cocok untuk webcam laptop atau kamera USB:
+- [Ultralytics YOLOv8 OpenCV ONNX Example](https://github.com/ultralytics/ultralytics/blob/main/examples/YOLOv8-OpenCV-ONNX-Python/README.md)
 
-- `source` dapat berupa angka seperti `0`, `1`, atau `2`
-- ada konfigurasi backend kamera seperti `dshow`, `msmf`, `v4l2`, atau `auto`
-- bisa mengatur resolusi target, FPS target, warmup frame, dan flip gambar
-- timestamp live camera memakai waktu nyata, bukan metadata file video
+## Camera Usage
+CarDetec mendukung camera device secara langsung.
+
+### Scan kamera
+Windows:
+
+```bash
+cardetec cameras --max-devices 5 --backend dshow
+```
+
+Linux:
+
+```bash
+cardetec cameras --max-devices 5 --backend v4l2
+```
+
+### Validasi kamera dan model
+
+```bash
+cardetec doctor --config configs/camera.yaml --check-camera
+```
 
 ### Jalankan webcam default
 
@@ -166,202 +196,44 @@ Versi terbaru aplikasi sudah ditingkatkan agar lebih cocok untuk webcam laptop a
 cardetec run --config configs/camera.yaml
 ```
 
-### Scan camera device lebih dulu
-
-```bash
-cardetec cameras --max-devices 5 --backend dshow
-```
-
-Jika Anda memakai Linux:
-
-```bash
-cardetec cameras --max-devices 5 --backend v4l2
-```
-
-### Jika kamera utama bukan device `0`
-
-Ubah bagian ini:
-
-```yaml
-source: 1
-```
-
-### Preset untuk laptop biasa atau PC spek menengah
+### Jalankan mode ringan
 
 ```bash
 cardetec run --config configs/camera-low-power.yaml
 ```
 
-Preset ini menurunkan resolusi, FPS, dan melewati sebagian frame agar inferensi lebih ringan.
-
-### Opsi camera yang tersedia
-
-```yaml
-camera:
-  backend: dshow
-  width: 1280
-  height: 720
-  fps: 30.0
-  warmup_frames: 10
-  flip_horizontal: false
-  flip_vertical: false
-  retry_open_count: 3
-```
-
-Keterangan:
-
-- `backend`: backend OpenCV untuk membuka kamera
-- `width` dan `height`: resolusi target capture
-- `fps`: target FPS kamera
-- `warmup_frames`: jumlah frame awal yang dibuang agar exposure lebih stabil
-- `flip_horizontal`: berguna jika webcam menampilkan preview seperti cermin
-- `retry_open_count`: jumlah percobaan buka kamera jika device lambat siap
-
-### Rekomendasi desktop Windows
-
-- pakai `backend: dshow` lebih dulu
-- jika gagal, coba `backend: msmf`
-- gunakan resolusi `1280x720` atau `960x540` bila inferensi terasa berat
-- letakkan dua garis kalibrasi di area jalan yang sering dilewati kendaraan
-
-### Cek kesiapan camera config
-
-```bash
-cardetec doctor --config configs/camera.yaml --check-camera
-```
-
-Perintah ini mengecek:
-
-- file config ada,
-- YAML bisa dibaca,
-- OpenCV tersedia,
-- file model tersedia,
-- kamera bisa dibuka jika `source` berupa device index.
-
-### Generate config lokal otomatis
-
-Jika Anda ingin membuat config baru tanpa mengedit file manual:
+### Generate config otomatis
 
 ```bash
 cardetec init-config --preset camera --output configs/local-camera.yaml --source 1
 ```
 
-Untuk preset video:
+## Available Configs
+| Config | Kegunaan |
+|---|---|
+| `configs/default.yaml` | Untuk file video desktop |
+| `configs/camera.yaml` | Untuk webcam atau USB camera |
+| `configs/camera-low-power.yaml` | Untuk laptop atau PC yang lebih ringan |
+| `configs/termux.yaml` | Untuk Termux dan file video di Android |
 
-```bash
-cardetec init-config --preset video --output configs/local-video.yaml --source samples/traffic.mp4
-```
+## Important Parameters
+| Parameter | Fungsi |
+|---|---|
+| `source` | Path video atau index kamera seperti `0`, `1`, `2` |
+| `output_video` | Lokasi hasil video anotasi |
+| `output_events_csv` | Lokasi CSV event kecepatan |
+| `display` | Tampilkan preview OpenCV atau tidak |
+| `skip_frames` | Lewati frame untuk menurunkan beban komputasi |
+| `camera.backend` | Backend OpenCV seperti `dshow`, `msmf`, `v4l2`, `auto` |
+| `camera.width`, `camera.height` | Resolusi target capture |
+| `camera.fps` | FPS target untuk webcam |
+| `camera.warmup_frames` | Frame awal yang dibuang agar kamera stabil |
+| `camera.flip_horizontal` | Balik preview horizontal |
+| `model.path` | Path model YOLO ONNX |
+| `speed.real_distance_meters` | Jarak nyata antara garis A dan B |
+| `speed.line_a`, `speed.line_b` | Posisi dua garis pengukuran |
 
-### Rekomendasi laptop atau webcam
-
-- gunakan tripod atau posisi kamera statis
-- arahkan kamera ke jalan dari sudut yang konsisten
-- hindari auto-focus berlebihan dan guncangan
-- sesuaikan `skip_frames` jika CPU tidak kuat
-
-## Instalasi di Termux
-
-Pendekatan Termux pada repo ini sengaja memakai `OpenCV DNN + ONNX` agar tidak bergantung pada PyTorch desktop.
-
-Menurut dokumentasi Termux, OpenCV Python sebaiknya dipasang dari package manager Termux, bukan dari `pip`, untuk menghindari error build:
-[Termux Python Wiki](https://wiki.termux.com/wiki/Python)
-
-Ada juga issue Termux yang menunjukkan `pip install opencv-python` bisa gagal dan solusi yang disarankan adalah memakai `pkg install opencv-python`:
-[termux-packages issue #25847](https://github.com/termux/termux-packages/issues/25847)
-
-### 1. Install paket sistem
-
-```bash
-pkg update && pkg upgrade
-pkg install python git ffmpeg opencv-python python-numpy
-```
-
-### 2. Clone repo
-
-```bash
-git clone https://github.com/username/cardetec.git
-cd cardetec
-```
-
-### 3. Install paket Python murni
-
-```bash
-pip install --upgrade pip
-pip install -r requirements-termux.txt
-pip install -e . --no-deps
-```
-
-Alasan memakai `--no-deps`: `numpy` dan `opencv-python` sudah dipenuhi dari paket Termux.
-
-### 4. Beri akses storage
-
-```bash
-termux-setup-storage
-```
-
-### 5. Salin file video dan model
-
-- video: `/sdcard/Download/traffic.mp4`
-- model: `models/yolov8n.onnx`
-
-### 6. Jalankan mode Termux
-
-```bash
-cardetec run --config configs/termux.yaml
-```
-
-### 7. Validasi setup Termux
-
-```bash
-cardetec doctor --config configs/termux.yaml
-```
-
-Catatan:
-
-- `display: false` di config Termux karena `cv2.imshow()` biasanya tidak dipakai di Termux biasa.
-- Hasil video dan CSV akan tersimpan di folder `outputs/`.
-
-## Konfigurasi
-
-Contoh file `configs/default.yaml`:
-
-```yaml
-source: samples/traffic.mp4
-output_video: outputs/result.mp4
-output_events_csv: outputs/events.csv
-display: true
-
-model:
-  path: models/yolov8n.onnx
-
-speed:
-  real_distance_meters: 12.0
-  line_a:
-    start: [120, 260]
-    end: [520, 260]
-  line_b:
-    start: [120, 360]
-    end: [520, 360]
-```
-
-Parameter penting:
-
-- `source`: path video atau index kamera, misalnya `0`
-- `output_video`: lokasi video hasil anotasi
-- `output_events_csv`: lokasi CSV event kecepatan
-- `display`: tampilkan window OpenCV atau tidak
-- `skip_frames`: lewati frame untuk mengurangi beban proses
-- `camera.backend`: backend kamera OpenCV
-- `camera.width`, `camera.height`, `camera.fps`: target capture untuk webcam
-- `camera.warmup_frames`: buang beberapa frame awal agar kamera stabil
-- `camera.flip_horizontal`, `camera.flip_vertical`: membalik frame live camera
-- `model.path`: path model YOLO ONNX
-- `speed.real_distance_meters`: jarak nyata antara garis `A` dan `B`
-- `speed.line_a` dan `speed.line_b`: koordinat piksel dua garis pengukuran
-
-## Command CLI
-
-Command utama yang sekarang tersedia:
+## CLI Commands
 
 ```bash
 cardetec run --config configs/camera.yaml
@@ -370,34 +242,44 @@ cardetec doctor --config configs/camera.yaml --check-camera
 cardetec init-config --preset camera --output configs/local-camera.yaml
 ```
 
-Keterangan singkat:
+Ringkasannya:
 
-- `run`: menjalankan deteksi kendaraan dan estimasi kecepatan
-- `cameras`: scan device camera yang tersedia
-- `doctor`: validasi environment, config, model, dan camera
-- `init-config`: generate file config baru dari preset
+- `run`: menjalankan deteksi dan estimasi kecepatan
+- `cameras`: scan camera device
+- `doctor`: validasi environment dan config
+- `init-config`: generate config baru dari preset
 
-## Supaya Langsung Bisa Dipakai
+## Project Structure
 
-Checklist minimum:
-
-- Python sudah terpasang
-- OpenCV sudah terpasang
-- `PyYAML` dan `typer` sudah terpasang
-- model `models/yolov8n.onnx` sudah tersedia
-- kamera atau video source tersedia
-- garis `line_a` dan `line_b` sudah disesuaikan dengan sudut kamera Anda
-
-Langkah paling praktis untuk webcam:
-
-```bash
-pip install -r requirements-desktop.txt
-cardetec cameras --max-devices 5 --backend dshow
-cardetec doctor --config configs/camera.yaml --check-camera
-cardetec run --config configs/camera.yaml
+```text
+cardetec/
+├── .github/workflows/ci.yml
+├── configs/
+│   ├── default.yaml
+│   ├── camera.yaml
+│   ├── camera-low-power.yaml
+│   └── termux.yaml
+├── models/
+│   └── README.md
+├── outputs/
+├── samples/
+├── src/cardetec/
+│   ├── __init__.py
+│   ├── __main__.py
+│   ├── cli.py
+│   ├── config.py
+│   ├── speed.py
+│   ├── tracker.py
+│   └── yolo_onnx.py
+├── tests/
+│   ├── test_config.py
+│   └── test_speed.py
+├── pyproject.toml
+├── requirements-desktop.txt
+└── requirements-termux.txt
 ```
 
-## Contoh Output CSV
+## Example CSV Output
 
 ```csv
 track_id,label,direction,speed_kmh,elapsed_seconds,frame
@@ -405,68 +287,40 @@ track_id,label,direction,speed_kmh,elapsed_seconds,frame
 8,truck,B->A,37.90,1.140,263
 ```
 
-## Menyesuaikan Kalibrasi Kecepatan
+## Calibration Tips
+Supaya hasil estimasi lebih akurat:
 
-Supaya hasil lebih akurat:
+- gunakan kamera statis, jangan handheld
+- pilih dua garis yang benar-benar memotong jalur kendaraan
+- ukur jarak nyata antar garis di lokasi
+- sesuaikan posisi garis dengan perspektif kamera
+- uji beberapa video sampai crossing konsisten
 
-- gunakan video statis, bukan kamera goyang,
-- pilih dua garis yang memotong jalur kendaraan,
-- ukur jarak riil antar garis di lapangan,
-- sesuaikan `real_distance_meters`,
-- sesuaikan posisi garis di config agar sejajar dengan area jalan,
-- uji beberapa video dan lihat apakah crossing terjadi konsisten.
-
-## Menjalankan Test
+## Testing
 
 ```bash
 python -m pytest -q
 ```
 
-## Cek Kualitas Kode
+## Linting
 
 ```bash
 python -m ruff check .
 ```
 
-## Deploy ke GitHub
+## Current Limitations
+- tracker masih centroid-based, belum ByteTrack atau DeepSORT
+- akurasi kecepatan sangat bergantung pada kalibrasi garis
+- belum ada perspective correction atau homography mapping
+- paling cocok untuk demo, prototipe, dan CCTV dengan sudut stabil
 
-1. Buat repository baru di GitHub.
-2. Inisialisasi git lokal jika belum ada.
-3. Commit semua file.
-4. Push ke branch utama.
+## Roadmap
+- dukungan RTSP / IP camera
+- dashboard web FastAPI
+- snapshot pelanggaran kendaraan
+- export JSON event
+- tracker yang lebih kuat
+- kalibrasi 4 titik berbasis perspektif
 
-Contoh:
-
-```bash
-git init
-git add .
-git commit -m "feat: initial car speed detection app"
-git branch -M main
-git remote add origin https://github.com/username/cardetec.git
-git push -u origin main
-```
-
-Setelah di-push, workflow `.github/workflows/ci.yml` akan menjalankan test otomatis pada setiap `push` dan `pull_request`.
-
-## Batasan Saat Ini
-
-- Tracking masih memakai centroid tracker sederhana, belum ByteTrack/DeepSORT.
-- Akurasi kecepatan sangat bergantung pada kalibrasi garis dan kualitas video.
-- Tanpa perspektif correction, hasil cocok untuk demo, prototipe, atau CCTV dengan sudut yang stabil.
-- Untuk produksi, sebaiknya tambahkan homography/perspective mapping dan tracker yang lebih kuat.
-
-## Pengembangan Lanjutan
-
-Beberapa upgrade yang bisa Anda tambahkan:
-
-- dukungan RTSP/IP camera,
-- dashboard web dengan FastAPI,
-- simpan snapshot pelanggaran,
-- export JSON event,
-- tracker ByteTrack,
-- kalibrasi perspektif berbasis 4 titik,
-- model custom hasil training sendiri.
-
-## Lisensi
-
+## License
 MIT
