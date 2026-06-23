@@ -1,0 +1,40 @@
+source: samples/traffic.mp4
+output_video: outputs/result.mp4
+output_events_csv: outputs/events.csv
+display: true
+skip_frames: 0
+max_frames:
+
+model:
+  path: models/yolov8n.onnx
+  input_size: 640
+  score_threshold: 0.25
+  confidence_threshold: 0.25
+  nms_threshold: 0.45
+  labels: []
+  allowed_classes:
+    - car
+    - bus
+    - truck
+    - motorcycle
+
+tracking:
+  max_distance: 90.0
+  max_missing_frames: 30
+  min_confirmed_hits: 3
+  trail_size: 24
+
+speed:
+  real_distance_meters: 12.0
+  min_speed_kmh: 1.0
+  max_speed_kmh: 220.0
+  line_a:
+    name: A
+    start: [120, 260]
+    end: [520, 260]
+    color_bgr: [0, 255, 255]
+  line_b:
+    name: B
+    start: [120, 360]
+    end: [520, 360]
+    color_bgr: [0, 165, 255]
