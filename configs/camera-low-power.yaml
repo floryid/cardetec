@@ -42,9 +42,9 @@ speed:
     name: A
     start: [160, 210]
     end: [800, 210]
-    color_bgr: [0, 255, 255]
+    color_bgr: [0, 255, 0]
   line_b:
     name: B
     start: [160, 340]
     end: [800, 340]
-    color_bgr: [0, 165, 255]
+    color_bgr: [0, 0, 255]

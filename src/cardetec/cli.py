@@ -46,29 +46,61 @@ def _draw_line(frame, start, end, color, text) -> None:
     cv2.line(frame, start, end, color, 2)
     text_x = min(start[0], end[0]) + 8
     text_y = min(start[1], end[1]) - 8
-    cv2.putText(frame, text, (text_x, max(20, text_y)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+    cv2.putText(frame, text, (text_x, max(20, text_y)), cv2.FONT_HERSHEY_SIMPLEX, 0.65, color, 2)
 
 
 def _draw_track(frame, track: Track, speed_text: str | None) -> None:
     x1, y1, x2, y2 = track.box
-    cv2.rectangle(frame, (x1, y1), (x2, y2), (40, 220, 40), 2)
+    box_color = (0, 255, 0)
+    cv2.rectangle(frame, (x1, y1), (x2, y2), box_color, 2)
 
-    title = f"ID {track.track_id} | {track.label} | {track.confidence:.2f}"
+    title = f"ID:{track.track_id} {track.label}"
     if speed_text:
-        title = f"{title} | {speed_text}"
+        title = f"{title} {speed_text}"
+    else:
+        title = f"{title} {track.confidence:.2f}"
+
+    (text_width, text_height), baseline = cv2.getTextSize(title, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+    text_top = max(0, y1 - text_height - baseline - 8)
+    text_bottom = text_top + text_height + baseline + 6
+    text_right = min(frame.shape[1] - 1, x1 + text_width + 10)
+    cv2.rectangle(frame, (x1, text_top), (text_right, text_bottom), box_color, -1)
     cv2.putText(
         frame,
         title,
-        (x1, max(25, y1 - 10)),
+        (x1 + 4, text_bottom - baseline - 3),
         cv2.FONT_HERSHEY_SIMPLEX,
-        0.55,
-        (255, 255, 255),
-        2,
+        0.5,
+        (0, 0, 0),
+        1,
     )
 
     centers = list(track.trail)
     for index in range(1, len(centers)):
-        cv2.line(frame, centers[index - 1], centers[index], (255, 120, 0), 2)
+        cv2.line(frame, centers[index - 1], centers[index], (0, 180, 0), 1)
+
+
+def _draw_header(frame, width: int, height: int, fps: float, is_camera: bool, active_tracks: int, recorded_events: int) -> None:
+    title = "YOLOV8 SPEED DETECTION"
+    cv2.putText(frame, title, (12, 26), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+    cv2.putText(
+        frame,
+        f"Sumber: {'CAMERA' if is_camera else 'VIDEO'}  {width}x{height}  {fps:.1f} FPS",
+        (12, 52),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.55,
+        (220, 255, 220),
+        1,
+    )
+    cv2.putText(
+        frame,
+        f"Kendaraan aktif: {active_tracks} | Event kecepatan: {recorded_events}",
+        (12, height - 16),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.55,
+        (220, 255, 220),
+        1,
+    )
 
 
 def _open_capture(source: str | int, camera_cfg: CameraConfig) -> tuple[cv2.VideoCapture, bool]:
@@ -357,24 +389,7 @@ def _run_pipeline(cfg: AppConfig) -> None:
                     recorded_events += 1
 
             processed_frames += 1
-            cv2.putText(
-                frame,
-                f"Frame: {processed_frames} | Kendaraan aktif: {len(active_tracks)} | Event: {recorded_events}",
-                (16, height - 20),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.65,
-                (255, 255, 255),
-                2,
-            )
-            cv2.putText(
-                frame,
-                f"Sumber: {'camera' if is_camera else 'video'} | {width}x{height} @ {fps:.1f} FPS",
-                (16, 30),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.65,
-                (255, 255, 255),
-                2,
-            )
+            _draw_header(frame, width, height, fps, is_camera, len(active_tracks), recorded_events)
 
             if writer is not None:
                 writer.write(frame)
