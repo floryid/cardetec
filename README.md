@@ -3,7 +3,8 @@
 # CarDetec
 
 <p>
-  <strong>Deteksi kendaraan dan estimasi kecepatan berbasis YOLO ONNX + OpenCV DNN</strong>
+  <strong>Vehicle Detection and Speed Estimation with YOLO ONNX + OpenCV DNN</strong><br>
+  <strong>Deteksi Kendaraan dan Estimasi Kecepatan dengan YOLO ONNX + OpenCV DNN</strong>
 </p>
 
 <p>
@@ -16,6 +17,7 @@
 <p>
   <img src="https://img.shields.io/badge/Desktop-Windows%20%7C%20Linux%20%7C%20macOS-0EA5E9?style=flat-square" alt="Desktop">
   <img src="https://img.shields.io/badge/Android-Termux-F97316?style=flat-square" alt="Termux">
+  <img src="https://img.shields.io/badge/Use%20Case-Automotive%20%7C%20Research%20%7C%20CCTV-111827?style=flat-square" alt="Use Case">
   <img src="https://img.shields.io/badge/License-MIT-10B981?style=flat-square" alt="MIT">
 </p>
 
@@ -23,78 +25,107 @@
 
 ---
 
-## Overview
-CarDetec adalah aplikasi Python untuk mendeteksi kendaraan yang bergerak, melakukan tracking antar frame, lalu menghitung estimasi kecepatan saat kendaraan melintasi dua garis kalibrasi.
+## Global Overview
+**English**
 
-Proyek ini dirancang agar:
+CarDetec is a lightweight Python application for vehicle detection, object tracking, and line-based speed estimation. It is designed for traffic demos, automotive analysis, CCTV experiments, and portable workflows on desktop or Android Termux.
 
-- ringan untuk CPU dengan `OpenCV DNN + ONNX`
-- rapi untuk dipakai sebagai repo GitHub
-- realistis dijalankan di desktop maupun Termux
-- mudah dipakai dengan preset webcam dan utilitas CLI
+**Indonesia**
 
-## Highlights
-| Fitur | Keterangan |
-|---|---|
-| Deteksi Kendaraan | Filter kelas `car`, `bus`, `truck`, `motorcycle` |
-| Speed Estimation | Hitung kecepatan berdasarkan dua garis ukur |
-| Camera Ready | Mendukung webcam, USB camera, dan file video |
-| CLI Tools | Ada `run`, `cameras`, `doctor`, dan `init-config` |
-| Multi Config | Preset desktop, low-power, dan Termux |
-| GitHub Friendly | Struktur project bersih dan siap dipublish |
+CarDetec adalah aplikasi Python ringan untuk deteksi kendaraan, tracking objek, dan estimasi kecepatan berbasis dua garis ukur. Proyek ini dirancang untuk demo lalu lintas, analisis otomotif, eksperimen CCTV, dan workflow portabel di desktop maupun Android Termux.
+
+## Why CarDetec
+| Feature | English | Indonesia |
+|---|---|---|
+| Vehicle Detection | Detects `car`, `bus`, `truck`, and `motorcycle` classes | Mendeteksi kelas `car`, `bus`, `truck`, dan `motorcycle` |
+| Speed Estimation | Computes vehicle speed from two calibrated lines | Menghitung kecepatan kendaraan dari dua garis kalibrasi |
+| Camera Ready | Supports webcam, USB camera, and video files | Mendukung webcam, USB camera, dan file video |
+| Termux Friendly | Can run in Android Termux without desktop GUI | Dapat berjalan di Android Termux tanpa GUI desktop |
+| Simple Launcher | Includes short launcher commands for quick use | Menyediakan launcher singkat agar mudah dijalankan |
+| GitHub Ready | Clean project structure for sharing and deployment | Struktur proyek rapi untuk dibagikan dan dipublikasikan |
 
 ## Quick Start
-Jika Anda ingin langsung mencoba dari webcam:
+**English**
+
+If you want to try the project quickly on desktop:
 
 ```bash
 git clone https://github.com/floryid/cardetec.git
 cd cardetec
 pip install -r requirements-desktop.txt
-cardetec cameras --max-devices 5 --backend dshow
-cardetec doctor --config configs/camera.yaml --check-camera
-cardetec run --config configs/camera.yaml
-```
-
-## Cara Paling Mudah
-Setelah dependency terpasang, Anda tidak perlu mengetik command panjang.
-
-Pakai launcher singkat ini:
-
-```bash
 python jalan.py
 ```
 
-Mode lain yang mudah diingat:
+**Indonesia**
+
+Jika ingin langsung mencoba di desktop:
 
 ```bash
+git clone https://github.com/floryid/cardetec.git
+cd cardetec
+pip install -r requirements-desktop.txt
+python jalan.py
+```
+
+## Easiest Way
+**English**
+
+After installing dependencies, use the short launcher so you do not need long CLI commands.
+
+```bash
+python jalan.py
 python jalan.py kamera
 python jalan.py cek
 python jalan.py scan
+python jalan.py termux
 ```
 
-Untuk Windows, bisa juga langsung:
+**Indonesia**
+
+Setelah dependency terpasang, gunakan launcher singkat agar tidak perlu mengetik command panjang.
+
+```bash
+python jalan.py
+python jalan.py kamera
+python jalan.py cek
+python jalan.py scan
+python jalan.py termux
+```
+
+**Windows**
 
 ```bash
 mulai.bat
 mulai.bat cek
 ```
 
-Di Linux atau Termux, pakai:
+**Linux / Termux**
 
 ```bash
 bash mulai.sh
 bash mulai.sh cek
 ```
 
-Untuk laptop atau PC spek menengah:
+## Launcher Modes
+| Command | English | Indonesia |
+|---|---|---|
+| `python jalan.py` | Auto default mode, optimized for easy startup | Mode default otomatis, dioptimalkan agar mudah dijalankan |
+| `python jalan.py kamera` | Standard desktop camera mode | Mode kamera desktop standar |
+| `python jalan.py termux` | Android Termux preset without GUI preview | Preset Android Termux tanpa preview GUI |
+| `python jalan.py video file.mp4` | Run a specific video file quickly | Jalankan file video tertentu dengan cepat |
+| `python jalan.py cek` | Check camera and model readiness | Cek kesiapan kamera dan model |
+| `python jalan.py scan` | Scan available camera devices | Scan camera device yang tersedia |
 
-```bash
-cardetec run --config configs/camera-low-power.yaml
-```
+## Automotive Use Cases
+**English**
 
-## Demo Flow
-Alur kerja aplikasi:
+CarDetec is suitable for automotive demos, traffic research, roadside observation, prototype enforcement systems, and speed analysis experiments.
 
+**Indonesia**
+
+CarDetec cocok untuk demo otomotif, riset lalu lintas, observasi jalan, prototipe sistem penegakan, dan eksperimen analisis kecepatan kendaraan.
+
+## Detection Flow
 ```text
 Camera / Video
       |
@@ -114,55 +145,70 @@ Speed Estimation (km/h)
 Annotated Video + CSV Events
 ```
 
-Rumus kecepatan:
+**Formula / Rumus**
 
 ```text
-kecepatan (km/h) = (jarak_meter / waktu_detik) * 3.6
+speed (km/h) = (distance_meters / time_seconds) * 3.6
 ```
 
-## Preview Style
-Tampilan overlay aplikasi sekarang dibuat lebih bersih agar fokus ke kendaraan dan angka kecepatan:
+## Overlay Style
+**English**
 
-- box kendaraan per objek
-- label `km/jam` muncul di mobil yang sudah terukur
-- ID dan nama objek tetap terlihat ringkas
-- hasil event kecepatan tetap tersimpan ke CSV
-- cocok untuk demo riset, konten otomotif, dan analisis lapangan
+The overlay is intentionally minimal so the user can focus on each detected vehicle and its speed label.
+
+**Indonesia**
+
+Overlay dibuat minimal agar pengguna fokus pada tiap kendaraan yang terdeteksi dan label kecepatannya.
+
+- Vehicle box per object
+- Speed label appears only when the speed is already measured
+- ID and object label stay compact
+- CSV speed events remain available
+- Suitable for demos, field tests, and automotive content
 
 ## Installation
 ### Desktop
+**English**
+
+Create a virtual environment and install desktop dependencies:
 
 ```bash
 python -m venv .venv
 ```
 
-Windows:
+**Windows**
 
 ```bash
 .venv\Scripts\activate
 ```
 
-Linux/macOS:
+**Linux/macOS**
 
 ```bash
 source .venv/bin/activate
 ```
-
-Install dependency:
 
 ```bash
 pip install --upgrade pip
 pip install -r requirements-desktop.txt
 ```
 
-Opsional untuk development:
+**Optional development tools / Opsional untuk development**
 
 ```bash
 pip install -e .[dev]
 ```
 
 ### Termux
-Pendekatan Termux sengaja memakai `OpenCV DNN + ONNX` agar tidak bergantung pada PyTorch desktop.
+**English**
+
+The Termux workflow uses `OpenCV DNN + ONNX` so it stays lighter than a full desktop PyTorch setup.
+
+**Indonesia**
+
+Workflow Termux memakai `OpenCV DNN + ONNX` agar lebih ringan dibanding setup PyTorch desktop penuh.
+
+**Manual setup**
 
 ```bash
 pkg update && pkg upgrade
@@ -173,60 +219,65 @@ pip install -e . --no-deps
 termux-setup-storage
 ```
 
-Cara yang lebih mudah di Termux:
+**Easy setup**
 
 ```bash
 bash install-termux.sh
 ```
 
-Sesudah instalasi, jalankan:
+**Run after install**
 
 ```bash
 bash mulai.sh
 ```
 
-Jika ingin memproses video Android:
+**Run Android video**
 
 ```bash
 bash mulai.sh video /sdcard/Download/traffic.mp4
 ```
 
-Perintah singkat lain di Termux:
+**Useful Termux commands**
 
 ```bash
 python jalan.py termux
 python jalan.py bantuan
 ```
 
-Referensi instalasi OpenCV di Termux:
+**References / Referensi**
 
 - [Termux Python Wiki](https://wiki.termux.com/wiki/Python)
 - [termux-packages issue #25847](https://github.com/termux/termux-packages/issues/25847)
 
 ## Model Setup
-Model tidak disertakan ke repo agar ukuran repository tetap ringan.
+**English**
 
-Simpan model di:
+The ONNX model is not stored in the repository to keep the project lightweight.
+
+**Indonesia**
+
+Model ONNX tidak disimpan di repository agar ukuran proyek tetap ringan.
+
+Save the model at:
 
 ```text
 models/yolov8n.onnx
 ```
 
-Jika Anda punya `yolov8n.pt`, ekspor ke ONNX:
+If you have `yolov8n.pt`, export it to ONNX:
 
 ```bash
 pip install ultralytics
 yolo export model=yolov8n.pt imgsz=640 format=onnx opset=12
 ```
 
-Panduan referensi:
+Reference:
 
 - [Ultralytics YOLOv8 OpenCV ONNX Example](https://github.com/ultralytics/ultralytics/blob/main/examples/YOLOv8-OpenCV-ONNX-Python/README.md)
 
-## Camera Usage
-CarDetec mendukung camera device secara langsung.
+## Camera And Video Usage
+**Scan camera**
 
-### Scan kamera
 Windows:
 
 ```bash
@@ -239,57 +290,56 @@ Linux:
 cardetec cameras --max-devices 5 --backend v4l2
 ```
 
-### Validasi kamera dan model
+**Validate camera and model**
 
 ```bash
 cardetec doctor --config configs/camera.yaml --check-camera
 ```
 
-### Jalankan webcam default
+**Run default webcam**
 
 ```bash
 cardetec run --config configs/camera.yaml
 ```
 
-### Jalankan mode ringan
+**Run low-power mode**
 
 ```bash
 cardetec run --config configs/camera-low-power.yaml
 ```
 
-### Generate config otomatis
+**Generate config automatically**
 
 ```bash
 cardetec init-config --preset camera --output configs/local-camera.yaml --source 1
 ```
 
 ## Available Configs
-| Config | Kegunaan |
-|---|---|
-| `configs/default.yaml` | Untuk file video desktop |
-| `configs/camera.yaml` | Untuk webcam atau USB camera |
-| `configs/camera-low-power.yaml` | Untuk laptop atau PC yang lebih ringan |
-| `configs/termux.yaml` | Untuk Termux dan file video di Android |
+| Config | English | Indonesia |
+|---|---|---|
+| `configs/default.yaml` | Desktop video preset | Preset video desktop |
+| `configs/camera.yaml` | Webcam or USB camera preset | Preset webcam atau USB camera |
+| `configs/camera-low-power.yaml` | Lighter camera preset for modest hardware | Preset kamera ringan untuk perangkat menengah |
+| `configs/termux.yaml` | Android Termux and mobile video preset | Preset Android Termux dan video mobile |
 
 ## Important Parameters
-| Parameter | Fungsi |
-|---|---|
-| `source` | Path video atau index kamera seperti `0`, `1`, `2` |
-| `output_video` | Lokasi hasil video anotasi |
-| `output_events_csv` | Lokasi CSV event kecepatan |
-| `display` | Tampilkan preview OpenCV atau tidak |
-| `skip_frames` | Lewati frame untuk menurunkan beban komputasi |
-| `camera.backend` | Backend OpenCV seperti `dshow`, `msmf`, `v4l2`, `auto` |
-| `camera.width`, `camera.height` | Resolusi target capture |
-| `camera.fps` | FPS target untuk webcam |
-| `camera.warmup_frames` | Frame awal yang dibuang agar kamera stabil |
-| `camera.flip_horizontal` | Balik preview horizontal |
-| `model.path` | Path model YOLO ONNX |
-| `speed.real_distance_meters` | Jarak nyata antara garis A dan B |
-| `speed.line_a`, `speed.line_b` | Posisi dua garis pengukuran |
+| Parameter | English | Indonesia |
+|---|---|---|
+| `source` | Video path or camera index like `0`, `1`, `2` | Path video atau index kamera seperti `0`, `1`, `2` |
+| `output_video` | Output annotated video path | Lokasi hasil video anotasi |
+| `output_events_csv` | CSV path for recorded speed events | Lokasi CSV event kecepatan |
+| `display` | Enable or disable OpenCV preview | Menyalakan atau mematikan preview OpenCV |
+| `skip_frames` | Skip frames to reduce compute load | Melewati frame untuk menurunkan beban komputasi |
+| `camera.backend` | OpenCV backend such as `dshow`, `msmf`, `v4l2`, `auto` | Backend OpenCV seperti `dshow`, `msmf`, `v4l2`, `auto` |
+| `camera.width`, `camera.height` | Target capture resolution | Resolusi target capture |
+| `camera.fps` | Target webcam FPS | FPS target untuk webcam |
+| `camera.warmup_frames` | Initial frames discarded for camera stability | Frame awal yang dibuang agar kamera stabil |
+| `camera.flip_horizontal` | Flip frame horizontally | Membalik frame secara horizontal |
+| `model.path` | YOLO ONNX model path | Path model YOLO ONNX |
+| `speed.real_distance_meters` | Real-world distance between line A and line B | Jarak nyata antara garis A dan garis B |
+| `speed.line_a`, `speed.line_b` | Measuring line coordinates | Koordinat garis pengukuran |
 
 ## CLI Commands
-
 ```bash
 cardetec run --config configs/camera.yaml
 cardetec cameras --max-devices 5 --backend dshow
@@ -297,35 +347,14 @@ cardetec doctor --config configs/camera.yaml --check-camera
 cardetec init-config --preset camera --output configs/local-camera.yaml
 ```
 
-Ringkasannya:
-
-- `run`: menjalankan deteksi dan estimasi kecepatan
-- `cameras`: scan camera device
-- `doctor`: validasi environment dan config
-- `init-config`: generate config baru dari preset
-
-## Launcher Singkat
-Launcher dibuat agar aplikasi lebih mudah dipakai di desktop, Termux, dan kebutuhan demo otomotif.
-
-```bash
-python jalan.py
-python jalan.py kamera
-python jalan.py termux
-python jalan.py video samples/traffic.mp4
-python jalan.py scan
-python jalan.py cek
-```
-
-Ringkasannya:
-
-- `python jalan.py`: mode default otomatis, ringan di desktop dan siap pakai di Termux
-- `python jalan.py termux`: pakai preset Android tanpa preview GUI
-- `python jalan.py video file.mp4`: cepat untuk demo, riset, atau konten otomotif
-- `bash mulai.sh`: launcher singkat untuk Linux dan Termux
-- `mulai.bat`: launcher singkat untuk Windows
+| Command | English | Indonesia |
+|---|---|---|
+| `run` | Run detection and speed estimation | Menjalankan deteksi dan estimasi kecepatan |
+| `cameras` | Scan available cameras | Scan camera yang tersedia |
+| `doctor` | Validate environment and config | Validasi environment dan config |
+| `init-config` | Generate config from a preset | Generate config dari preset |
 
 ## Project Structure
-
 ```text
 cardetec/
 ├── .github/workflows/ci.yml
@@ -359,7 +388,6 @@ cardetec/
 ```
 
 ## Example CSV Output
-
 ```csv
 track_id,label,direction,speed_kmh,elapsed_seconds,frame
 3,car,A->B,42.15,1.025,188
@@ -367,39 +395,49 @@ track_id,label,direction,speed_kmh,elapsed_seconds,frame
 ```
 
 ## Calibration Tips
-Supaya hasil estimasi lebih akurat:
+**English**
 
-- gunakan kamera statis, jangan handheld
-- pilih dua garis yang benar-benar memotong jalur kendaraan
-- ukur jarak nyata antar garis di lokasi
-- sesuaikan posisi garis dengan perspektif kamera
-- uji beberapa video sampai crossing konsisten
+- Use a static camera, not a handheld recording
+- Place the two lines where vehicles clearly cross them
+- Measure the real-world distance between both lines
+- Match the line placement to the road perspective
+- Test several videos until crossing events are stable
+
+**Indonesia**
+
+- Gunakan kamera statis, jangan handheld
+- Tempatkan dua garis pada jalur yang benar-benar dilintasi kendaraan
+- Ukur jarak nyata antara kedua garis
+- Sesuaikan posisi garis dengan perspektif jalan
+- Uji beberapa video sampai crossing stabil
 
 ## Testing
-
 ```bash
 python -m pytest -q
 ```
 
 ## Linting
-
 ```bash
 python -m ruff check .
 ```
 
 ## Current Limitations
-- tracker masih centroid-based, belum ByteTrack atau DeepSORT
-- akurasi kecepatan sangat bergantung pada kalibrasi garis
-- belum ada perspective correction atau homography mapping
-- paling cocok untuk demo, prototipe, dan CCTV dengan sudut stabil
+| English | Indonesia |
+|---|---|
+| The tracker is still centroid-based, not ByteTrack or DeepSORT | Tracker masih berbasis centroid, belum ByteTrack atau DeepSORT |
+| Speed accuracy strongly depends on line calibration | Akurasi kecepatan sangat bergantung pada kalibrasi garis |
+| There is no perspective correction or homography mapping yet | Belum ada perspective correction atau homography mapping |
+| Best suited for demos, prototypes, and stable CCTV angles | Paling cocok untuk demo, prototipe, dan CCTV dengan sudut stabil |
 
 ## Roadmap
-- dukungan RTSP / IP camera
-- dashboard web FastAPI
-- snapshot pelanggaran kendaraan
-- export JSON event
-- tracker yang lebih kuat
-- kalibrasi 4 titik berbasis perspektif
+| English | Indonesia |
+|---|---|
+| RTSP / IP camera support | Dukungan RTSP / IP camera |
+| FastAPI web dashboard | Dashboard web FastAPI |
+| Vehicle violation snapshots | Snapshot pelanggaran kendaraan |
+| JSON event export | Export event JSON |
+| Stronger tracker | Tracker yang lebih kuat |
+| Perspective-based 4-point calibration | Kalibrasi 4 titik berbasis perspektif |
 
 ## License
 MIT
