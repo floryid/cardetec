@@ -2,14 +2,14 @@ source: 0
 output_video: outputs/camera_low_power_result.mp4
 output_events_csv: outputs/camera_low_power_events.csv
 display: true
-skip_frames: 1
+skip_frames: 0
 max_frames:
 
 camera:
   backend: dshow
-  width: 960
-  height: 540
-  fps: 20.0
+  width: 640
+  height: 360
+  fps: 15.0
   warmup_frames: 8
   flip_horizontal: false
   flip_vertical: false
@@ -40,11 +40,11 @@ speed:
   max_speed_kmh: 220.0
   line_a:
     name: A
-    start: [160, 210]
-    end: [800, 210]
+    start: [120, 140]
+    end: [520, 140]
     color_bgr: [0, 255, 0]
   line_b:
     name: B
-    start: [160, 340]
-    end: [800, 340]
+    start: [120, 240]
+    end: [520, 240]
     color_bgr: [0, 0, 255]

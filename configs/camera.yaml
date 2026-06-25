@@ -7,9 +7,9 @@ max_frames:
 
 camera:
   backend: dshow
-  width: 1280
-  height: 720
-  fps: 30.0
+  width: 960
+  height: 540
+  fps: 20.0
   warmup_frames: 10
   flip_horizontal: false
   flip_vertical: false
@@ -40,11 +40,11 @@ speed:
   max_speed_kmh: 220.0
   line_a:
     name: A
-    start: [200, 250]
-    end: [1080, 250]
+    start: [160, 180]
+    end: [800, 180]
     color_bgr: [0, 255, 0]
   line_b:
     name: B
-    start: [200, 430]
-    end: [1080, 430]
+    start: [160, 320]
+    end: [800, 320]
     color_bgr: [0, 0, 255]

@@ -55,6 +55,37 @@ cardetec doctor --config configs/camera.yaml --check-camera
 cardetec run --config configs/camera.yaml
 ```
 
+## Cara Paling Mudah
+Setelah dependency terpasang, Anda tidak perlu mengetik command panjang.
+
+Pakai launcher singkat ini:
+
+```bash
+python jalan.py
+```
+
+Mode lain yang mudah diingat:
+
+```bash
+python jalan.py kamera
+python jalan.py cek
+python jalan.py scan
+```
+
+Untuk Windows, bisa juga langsung:
+
+```bash
+mulai.bat
+mulai.bat cek
+```
+
+Di Linux atau Termux, pakai:
+
+```bash
+bash mulai.sh
+bash mulai.sh cek
+```
+
 Untuk laptop atau PC spek menengah:
 
 ```bash
@@ -90,14 +121,13 @@ kecepatan (km/h) = (jarak_meter / waktu_detik) * 3.6
 ```
 
 ## Preview Style
-Tampilan overlay aplikasi sekarang dibuat lebih modern dan mendekati gaya speed detection CCTV:
+Tampilan overlay aplikasi sekarang dibuat lebih bersih agar fokus ke kendaraan dan angka kecepatan:
 
-- judul hijau `YOLOV8 SPEED DETECTION`
-- box kendaraan hijau
-- label ID dan kecepatan di atas kendaraan
-- garis atas hijau
-- garis bawah merah
-- output event kecepatan ke CSV
+- box kendaraan per objek
+- label `km/jam` muncul di mobil yang sudah terukur
+- ID dan nama objek tetap terlihat ringkas
+- hasil event kecepatan tetap tersimpan ke CSV
+- cocok untuk demo riset, konten otomotif, dan analisis lapangan
 
 ## Installation
 ### Desktop
@@ -141,6 +171,31 @@ pip install --upgrade pip
 pip install -r requirements-termux.txt
 pip install -e . --no-deps
 termux-setup-storage
+```
+
+Cara yang lebih mudah di Termux:
+
+```bash
+bash install-termux.sh
+```
+
+Sesudah instalasi, jalankan:
+
+```bash
+bash mulai.sh
+```
+
+Jika ingin memproses video Android:
+
+```bash
+bash mulai.sh video /sdcard/Download/traffic.mp4
+```
+
+Perintah singkat lain di Termux:
+
+```bash
+python jalan.py termux
+python jalan.py bantuan
 ```
 
 Referensi instalasi OpenCV di Termux:
@@ -249,6 +304,26 @@ Ringkasannya:
 - `doctor`: validasi environment dan config
 - `init-config`: generate config baru dari preset
 
+## Launcher Singkat
+Launcher dibuat agar aplikasi lebih mudah dipakai di desktop, Termux, dan kebutuhan demo otomotif.
+
+```bash
+python jalan.py
+python jalan.py kamera
+python jalan.py termux
+python jalan.py video samples/traffic.mp4
+python jalan.py scan
+python jalan.py cek
+```
+
+Ringkasannya:
+
+- `python jalan.py`: mode default otomatis, ringan di desktop dan siap pakai di Termux
+- `python jalan.py termux`: pakai preset Android tanpa preview GUI
+- `python jalan.py video file.mp4`: cepat untuk demo, riset, atau konten otomotif
+- `bash mulai.sh`: launcher singkat untuk Linux dan Termux
+- `mulai.bat`: launcher singkat untuk Windows
+
 ## Project Structure
 
 ```text
@@ -274,6 +349,10 @@ cardetec/
 ├── tests/
 │   ├── test_config.py
 │   └── test_speed.py
+├── install-termux.sh
+├── jalan.py
+├── mulai.bat
+├── mulai.sh
 ├── pyproject.toml
 ├── requirements-desktop.txt
 └── requirements-termux.txt

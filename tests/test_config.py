@@ -47,3 +47,19 @@ def test_create_and_save_camera_preset(tmp_path: Path) -> None:
     assert loaded.model.path == "models/yolov8n.onnx"
     assert loaded.camera.backend == "dshow"
     assert loaded.speed.real_distance_meters == 6.0
+
+
+def test_create_and_save_termux_preset(tmp_path: Path) -> None:
+    config = create_default_config("termux")
+    output_file = tmp_path / "termux.yaml"
+
+    written_path = save_config(config, output_file)
+    loaded = load_config(written_path)
+
+    assert written_path == output_file
+    assert loaded.source == "/sdcard/Download/traffic.mp4"
+    assert loaded.display is False
+    assert loaded.skip_frames == 1
+    assert loaded.camera.backend == "auto"
+    assert loaded.output_video == "outputs/termux_result.mp4"
+    assert loaded.output_events_csv == "outputs/termux_events.csv"

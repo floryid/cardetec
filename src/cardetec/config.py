@@ -82,9 +82,9 @@ def create_default_config(preset: str = "video") -> AppConfig:
             display=True,
             camera=CameraConfig(
                 backend="dshow",
-                width=1280,
-                height=720,
-                fps=30.0,
+                width=960,
+                height=540,
+                fps=20.0,
                 warmup_frames=10,
                 retry_open_count=3,
             ),
@@ -111,6 +111,30 @@ def create_default_config(preset: str = "video") -> AppConfig:
                 real_distance_meters=12.0,
                 line_a=LineConfig("A", (120, 260), (520, 260), (0, 255, 255)),
                 line_b=LineConfig("B", (120, 360), (520, 360), (0, 165, 255)),
+            ),
+        )
+
+    if preset_name in {"camera-low-power", "low-power"}:
+        return AppConfig(
+            source=0,
+            output_video="outputs/camera_low_power_result.mp4",
+            output_events_csv="outputs/camera_low_power_events.csv",
+            display=True,
+            skip_frames=0,
+            camera=CameraConfig(
+                backend="dshow",
+                width=640,
+                height=360,
+                fps=15.0,
+                warmup_frames=8,
+                retry_open_count=3,
+            ),
+            model=ModelConfig(path="models/yolov8n.onnx"),
+            tracking=TrackingConfig(max_distance=85.0, max_missing_frames=16, min_confirmed_hits=2, trail_size=20),
+            speed=SpeedConfig(
+                real_distance_meters=6.0,
+                line_a=LineConfig("A", (120, 140), (520, 140), (0, 255, 0)),
+                line_b=LineConfig("B", (120, 240), (520, 240), (0, 0, 255)),
             ),
         )
 
